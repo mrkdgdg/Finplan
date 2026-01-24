@@ -49,7 +49,7 @@
 <body>
 
 <button class="toggle" onclick="toggleMode()">🌗 Toggle</button>
-<h1>🇨🇦 Canada Migration Plan</h1>
+<h1>🇨🇦 Savings Plan</h1>
 <p class="muted">One‑tap reminder of your financial system</p>
 
 <div class="card">
@@ -67,18 +67,29 @@
 </div>
 
 <div class="card">
-  <h2>💼 Monthly Snapshot</h2>
+  <h2>💼 Snapshot: Jan–May (With Debt)</h2>
   <table>
     <tr><th>Salary</th><td contenteditable>4000</td></tr>
     <tr><th>Living Expenses</th><td contenteditable>1130</td></tr>
     <tr><th>iPhone (until Aug 2026)</th><td contenteditable>478</td></tr>
-    <tr><th>Credit Card (until May)</th><td contenteditable>1368</td></tr>
+    <tr><th>Credit Card (Debt)</th><td contenteditable>1368</td></tr>
     <tr><th>Available Cash</th><td class="accent">1024</td></tr>
   </table>
   <div class="countdown">
     <span id="debtCountdown" style="font-weight: bold; color: var(--accent);"></span>
   </div>
-  <p class="muted">Tap any number to edit (auto‑saved locally)</p>
+</div>
+
+<div class="card">
+  <h2>🚀 Snapshot: Post-May (No CC Debt)</h2>
+  <table>
+    <tr><th>Salary</th><td contenteditable>4000</td></tr>
+    <tr><th>Living Expenses</th><td contenteditable>1130</td></tr>
+    <tr><th>iPhone (until Aug 2026)</th><td contenteditable>478</td></tr>
+    <tr><th>Credit Card (Debt)</th><td class="muted">0</td></tr>
+    <tr><th>Available Cash</th><td class="accent">2392</td></tr>
+  </table>
+  <p class="muted">This is your cash flow once debt is cleared!</p>
 </div>
 
 <div class="card">
@@ -107,7 +118,7 @@
   }
 
   function updateCountdown() {
-    const targetDate = new Date(2026, 4, 1); // May 2026 (Month is 0-indexed)
+    const targetDate = new Date(2026, 4, 1); // May 2026
     const now = new Date();
     const diffTime = targetDate - now;
     const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30.44));
@@ -129,7 +140,6 @@
     localStorage.setItem('checkin', e.target.checked);
   });
 
-  // restore state
   if (localStorage.getItem('savings')) document.getElementById('savings').value = localStorage.getItem('savings'), updateProgress();
   if (localStorage.getItem('mode')) document.body.className = localStorage.getItem('mode');
   if (localStorage.getItem('checkin') === 'true') document.getElementById('checkin').checked = true;
