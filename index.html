@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Canada Migration Plan</title>
+  <title>Savings Plan</title>
   <style>
     :root {
       --bg: #0f172a;
@@ -11,7 +11,7 @@
       --text: #e5e7eb;
       --muted: #94a3b8;
       --accent: #22c55e;
-      --warn: #f43f5e; /* Red for debt/deficit */
+      --warn: #facc15;
     }
     body.light {
       --bg: #f8fafc;
@@ -38,12 +38,12 @@
     td,th { padding:8px; border-bottom:1px solid #334155; font-size:14px }
     th { text-align:left }
     .accent { color: var(--accent); font-weight:600 }
-    .debt { color: #f43f5e; font-weight:600 }
     .muted { color: var(--muted); font-size:13px }
     .toggle { float:right }
-    input[type="number"] { width:100%; padding:6px; border-radius:6px; border:1px solid #64748b; background: transparent; color: inherit; }
+    input[type="number"] { width:100%; padding:6px; border-radius:6px; border:1px solid #64748b }
     progress { width:100%; height:18px }
     .affirmation { font-size:15px; margin-top:8px }
+    .countdown { background: rgba(34, 197, 94, 0.1); border: 1px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin-top: 10px; }
   </style>
 </head>
 <body>
@@ -69,16 +69,16 @@
 <div class="card">
   <h2>💼 Monthly Snapshot</h2>
   <table>
-    <tr><th>Salary</th><td id="salary" contenteditable oninput="calculateBalance()">4000</td></tr>
-    <tr><th>Living Expenses</th><td id="expenses" contenteditable oninput="calculateBalance()">1130</td></tr>
-    <tr><th>iPhone (until Aug 2026)</th><td id="iphone" contenteditable oninput="calculateBalance()">478</td></tr>
-    <tr><th>Credit Card Debt</th><td id="debt" class="debt" contenteditable oninput="calculateBalance()">6840</td></tr>
-    <tr style="border-top: 2px solid #334155;">
-      <th>Available Cash</th>
-      <td id="available" class="accent">0</td>
-    </tr>
+    <tr><th>Salary</th><td contenteditable>4000</td></tr>
+    <tr><th>Living Expenses</th><td contenteditable>1130</td></tr>
+    <tr><th>iPhone (until Aug 2026)</th><td contenteditable>478</td></tr>
+    <tr><th>Credit Card (until May)</th><td contenteditable>1368</td></tr>
+    <tr><th>Available Cash</th><td class="accent">1024</td></tr>
   </table>
-  <p class="muted">Tap numbers to edit. Values update automatically.</p>
+  <div class="countdown">
+    <span id="debtCountdown" style="font-weight: bold; color: var(--accent);"></span>
+  </div>
+  <p class="muted">Tap any number to edit (auto‑saved locally)</p>
 </div>
 
 <div class="card">
@@ -94,41 +94,30 @@
     "Future you is counting on today you."
   ];
 
-  function calculateBalance() {
-    const salary = parseFloat(document.getElementById('salary').innerText) || 0;
-    const expenses = parseFloat(document.getElementById('expenses').innerText) || 0;
-    const iphone = parseFloat(document.getElementById('iphone').innerText) || 0;
-    const debt = parseFloat(document.getElementById('debt').innerText) || 0;
-    
-    const available = salary - expenses - iphone - debt;
-    const display = document.getElementById('available');
-    
-    display.innerText = available.toLocaleString() + " MYR";
-    
-    // Change color to red if negative
-    if (available < 0) {
-      display.style.color = "#f43f5e";
-    } else {
-      display.style.color = "#22c55e";
-    }
-
-    // Save values
-    localStorage.setItem('salary', salary);
-    localStorage.setItem('expenses', expenses);
-    localStorage.setItem('iphone', iphone);
-    localStorage.setItem('debt', debt);
-  }
-
   function updateProgress() {
     const val = Number(document.getElementById('savings').value || 0);
     document.getElementById('bar').value = val;
-    document.getElementById('progressText').innerText = `${val.toLocaleString()} / 24,710 MYR`;
+    document.getElementById('progressText').innerText = `${val} / 24,710 MYR`;
     localStorage.setItem('savings', val);
   }
 
   function toggleMode() {
     document.body.classList.toggle('light');
     localStorage.setItem('mode', document.body.className);
+  }
+
+  function updateCountdown() {
+    const targetDate = new Date(2026, 4, 1); // May 2026 (Month is 0-indexed)
+    const now = new Date();
+    const diffTime = targetDate - now;
+    const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30.44));
+    
+    const element = document.getElementById('debtCountdown');
+    if (diffMonths > 0) {
+      element.innerText = `⏳ ${diffMonths} months until Credit Card is paid off!`;
+    } else {
+      element.innerText = `🎉 Credit Card Debt Cleared!`;
+    }
   }
 
   document.getElementById('checkin').addEventListener('change', e => {
@@ -140,22 +129,12 @@
     localStorage.setItem('checkin', e.target.checked);
   });
 
-  // Restore state
-  window.onload = () => {
-    if (localStorage.getItem('savings')) {
-      document.getElementById('savings').value = localStorage.getItem('savings');
-      updateProgress();
-    }
-    if (localStorage.getItem('salary')) document.getElementById('salary').innerText = localStorage.getItem('salary');
-    if (localStorage.getItem('expenses')) document.getElementById('expenses').innerText = localStorage.getItem('expenses');
-    if (localStorage.getItem('iphone')) document.getElementById('iphone').innerText = localStorage.getItem('iphone');
-    if (localStorage.getItem('debt')) document.getElementById('debt').innerText = localStorage.getItem('debt');
-    
-    if (localStorage.getItem('mode')) document.body.className = localStorage.getItem('mode');
-    if (localStorage.getItem('checkin') === 'true') document.getElementById('checkin').checked = true;
-    
-    calculateBalance();
-  };
+  // restore state
+  if (localStorage.getItem('savings')) document.getElementById('savings').value = localStorage.getItem('savings'), updateProgress();
+  if (localStorage.getItem('mode')) document.body.className = localStorage.getItem('mode');
+  if (localStorage.getItem('checkin') === 'true') document.getElementById('checkin').checked = true;
+  
+  updateCountdown();
 </script>
 
 </body>
