@@ -3,156 +3,118 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Personal Finance Tracker</title>
+  <title>My Canada Migration Plan</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: var(--bg);
-      color: var(--text);
-      transition: background-color 0.3s, color 0.3s;
-    }
     :root {
-      --bg: #f9f9f9;
-      --text: #222;
-      --card: #fff;
+      --bg: #0f172a;
+      --card: #020617;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #22c55e;
+      --warn: #facc15;
     }
-    [data-theme="dark"] {
-      --bg: #1e1e1e;
-      --text: #eee;
-      --card: #2a2a2a;
+    body.light {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #020617;
+      --muted: #475569;
     }
-    .container {
-      max-width: 600px;
-      margin: auto;
-      padding: 20px;
-    }
-    .card {
-      background: var(--card);
-      border-radius: 12px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      padding: 20px;
-      margin-bottom: 15px;
-    }
-    .progress-container {
-      width: 100%;
-      background: #ddd;
-      border-radius: 8px;
-      overflow: hidden;
-      margin: 10px 0;
-    }
-    .progress-bar {
-      height: 20px;
-      width: 0%;
-      background: #4caf50;
-      text-align: center;
-      color: white;
-      font-size: 12px;
-    }
-    .toggle {
-      float: right;
-      cursor: pointer;
-    }
-    input[type="number"] {
-      width: 100%;
-      padding: 6px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
+      padding: 16px;
     }
-    .month-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .month-item {
-      flex: 1 0 30%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+    h1,h2 { margin-top: 0 }
+    .card {
       background: var(--card);
-      border: 1px solid #ccc;
-      padding: 8px;
-      border-radius: 8px;
+      border-radius: 14px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 20px rgba(0,0,0,.25);
     }
-    .reminder {
-      text-align: center;
-      margin-top: 20px;
-      font-style: italic;
-      color: #555;
-    }
+    table { width:100%; border-collapse:collapse; }
+    td,th { padding:8px; border-bottom:1px solid #334155; font-size:14px }
+    th { text-align:left }
+    .accent { color: var(--accent); font-weight:600 }
+    .muted { color: var(--muted); font-size:13px }
+    .toggle { float:right }
+    input[type="number"] { width:100%; padding:6px; border-radius:6px; border:1px solid #64748b }
+    progress { width:100%; height:18px }
+    .affirmation { font-size:15px; margin-top:8px }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="card">
-      <span class="toggle" onclick="toggleTheme()">🌗</span>
-      <h2>Personal Finance Tracker</h2>
-      <label>Goal (MYR):</label>
-      <input type="number" id="goal" value="24710" />
-      <label>Current Savings (MYR):</label>
-      <input type="number" id="savings" oninput="updateProgress()" />
-      <div class="progress-container">
-        <div class="progress-bar" id="progress-bar">0%</div>
-      </div>
-    </div>
 
-    <div class="card">
-      <h3>Monthly Check-In</h3>
-      <div class="month-list" id="month-list"></div>
-    </div>
+<button class="toggle" onclick="toggleMode()">🌗 Toggle</button>
+<h1>🇨🇦 Canada Migration Plan</h1>
+<p class="muted">One‑tap reminder of your financial system</p>
 
-    <div class="reminder">
-      🔔 Reminder: This plan is your ticket to a better future. Keep the momentum — every choice today builds your tomorrow.
-    </div>
-  </div>
+<div class="card">
+  <h2>🎯 Goal Tracker</h2>
+  <label>Current Savings (MYR)</label>
+  <input type="number" id="savings" placeholder="Enter current savings" oninput="updateProgress()">
+  <progress id="bar" value="0" max="24710"></progress>
+  <p class="accent" id="progressText">0 / 24,710 MYR</p>
+</div>
 
-  <script>
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const monthList = document.getElementById("month-list");
+<div class="card">
+  <h2>📅 Monthly Check‑in</h2>
+  <label><input type="checkbox" id="checkin"> Did I follow the plan this month?</label>
+  <p class="affirmation" id="affirmation"></p>
+</div>
 
-    months.forEach((m, i) => {
-      const div = document.createElement("div");
-      div.className = "month-item";
-      const cb = document.createElement("input");
-      cb.type = "checkbox";
-      cb.id = month-${i};
-      cb.checked = localStorage.getItem(month-${i}) === "true";
-      cb.onchange = () => localStorage.setItem(month-${i}, cb.checked);
-      div.append(m, cb);
-      monthList.appendChild(div);
-    });
+<div class="card">
+  <h2>💼 Monthly Snapshot</h2>
+  <table>
+    <tr><th>Salary</th><td contenteditable>4000</td></tr>
+    <tr><th>Living Expenses</th><td contenteditable>1130</td></tr>
+    <tr><th>iPhone (until Aug 2026)</th><td contenteditable>478</td></tr>
+    <tr><th>Available Cash</th><td class="accent">2392</td></tr>
+  </table>
+  <p class="muted">Tap any number to edit (auto‑saved locally)</p>
+</div>
 
-    function updateProgress() {
-      const goal = parseFloat(document.getElementById('goal').value) || 0;
-      const savings = parseFloat(document.getElementById('savings').value) || 0;
-      const percent = Math.min((savings / goal) * 100, 100);
-      const bar = document.getElementById('progress-bar');
-      bar.style.width = percent + '%';
-      bar.textContent = percent.toFixed(1) + '%';
-      localStorage.setItem('savings', savings);
-      localStorage.setItem('goal', goal);
+<div class="card">
+  <h2>🧠 Reminder</h2>
+  <p class="accent">Progress beats perfection.</p>
+</div>
+
+<script>
+  const affirmations = [
+    "You are building something real. Stay steady.",
+    "One month of discipline beats years of regret.",
+    "Debt freedom is close. Don't quit now.",
+    "Future you is counting on today you."
+  ];
+
+  function updateProgress() {
+    const val = Number(document.getElementById('savings').value || 0);
+    document.getElementById('bar').value = val;
+    document.getElementById('progressText').innerText = `${val} / 24,710 MYR`;
+    localStorage.setItem('savings', val);
+  }
+
+  function toggleMode() {
+    document.body.classList.toggle('light');
+    localStorage.setItem('mode', document.body.className);
+  }
+
+  document.getElementById('checkin').addEventListener('change', e => {
+    if (!e.target.checked) {
+      document.getElementById('affirmation').innerText = affirmations[Math.floor(Math.random()*affirmations.length)];
+    } else {
+      document.getElementById('affirmation').innerText = "Good job. Stay consistent.";
     }
+    localStorage.setItem('checkin', e.target.checked);
+  });
 
-    function toggleTheme() {
-      const theme = document.body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      document.body.setAttribute('data-theme', theme);
-      localStorage.setItem('theme', theme);
-    }
+  // restore state
+  if (localStorage.getItem('savings')) document.getElementById('savings').value = localStorage.getItem('savings'), updateProgress();
+  if (localStorage.getItem('mode')) document.body.className = localStorage.getItem('mode');
+  if (localStorage.getItem('checkin') === 'true') document.getElementById('checkin').checked = true;
+</script>
 
-    window.onload = () => {
-      const theme = localStorage.getItem('theme') || 'light';
-      document.body.setAttribute('data-theme', theme);
-      const savedGoal = localStorage.getItem('goal');
-      const savedSavings = localStorage.getItem('savings');
-      if (savedGoal) document.getElementById('goal').value = savedGoal;
-      if (savedSavings) {
-        document.getElementById('savings').value = savedSavings;
-        updateProgress();
-      }
-    };
-  </script>
 </body>
 </html>
