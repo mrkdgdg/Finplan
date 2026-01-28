@@ -4,152 +4,167 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Savings Plan</title>
-  
-  <link rel="apple-touch-icon" href="logo.png">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #020617;
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --accent: #22c55e;
-      --warn: #facc15;
+      --bg:#0f172a;
+      --card:#020617;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --accent:#22c55e;
+      --warn:#facc15;
     }
     body.light {
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --text: #020617;
-      --muted: #475569;
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --text:#020617;
+      --muted:#475569;
     }
     body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      padding: 16px;
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      padding:16px;
     }
-    h1,h2 { margin-top: 0 }
-    .card {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 8px 20px rgba(0,0,0,.25);
+    h1,h2{margin-top:0}
+    .card{
+      background:var(--card);
+      border-radius:14px;
+      padding:16px;
+      margin-bottom:16px;
+      box-shadow:0 8px 20px rgba(0,0,0,.25);
     }
-    table { width:100%; border-collapse:collapse; }
-    td,th { padding:8px; border-bottom:1px solid #334155; font-size:14px }
-    th { text-align:left }
-    .accent { color: var(--accent); font-weight:600 }
-    .muted { color: var(--muted); font-size:13px }
-    .toggle { float:right }
-    input[type="number"] { width:100%; padding:6px; border-radius:6px; border:1px solid #64748b }
-    progress { width:100%; height:18px }
-    .affirmation { font-size:15px; margin-top:8px }
-    .countdown { background: rgba(34, 197, 94, 0.1); border: 1px dashed var(--accent); padding: 10px; border-radius: 8px; text-align: center; margin-top: 10px; }
+    .accent{color:var(--accent);font-weight:600}
+    .muted{color:var(--muted);font-size:13px}
+    input[type="number"]{
+      width:100%;
+      padding:6px;
+      border-radius:6px;
+      border:1px solid #64748b;
+      margin-bottom:6px;
+    }
+    progress{width:100%;height:18px}
+    button{
+      width:100%;
+      padding:8px;
+      border-radius:8px;
+      border:none;
+      background:var(--warn);
+      font-weight:600;
+      margin-top:8px;
+    }
+    .toggle{float:right}
   </style>
 </head>
+
 <body>
 
-<button class="toggle" onclick="toggleMode()">🌗 Toggle</button>
+<button class="toggle" onclick="toggleMode()">🌗</button>
+
 <h1>🇨🇦 Savings Plan</h1>
-<p class="muted">One‑tap reminder of your financial system</p>
+<p class="muted">One-tap reminder of your financial system</p>
 
+<!-- SAVINGS -->
 <div class="card">
-  <h2>🎯 Goal Tracker</h2>
+  <h2>🎯 Savings Goal</h2>
   <label>Current Savings (MYR)</label>
-  <input type="number" id="savings" placeholder="Enter current savings" oninput="updateProgress()">
-  <progress id="bar" value="0" max="24710"></progress>
-  <p class="accent" id="progressText">0 / 24,710 MYR</p>
+  <input type="number" id="savings" oninput="updateSavings()">
+  <progress id="savingsBar" max="24710"></progress>
+  <p class="accent" id="savingsText">0 / 24,710 MYR</p>
+</div>
+
+<!-- CREDIT CARD -->
+<div class="card">
+  <h2>💳 Credit Card Payoff (Auto-Interest)</h2>
+
+  <label>Total Credit Card Balance (PHP)</label>
+  <input type="number" id="ccTotal" value="106704.61">
+
+  <label>Remaining Balance (PHP)</label>
+  <input type="number" id="ccRemaining">
+
+  <label>Monthly Interest Rate (%)</label>
+  <input type="number" id="ccInterest" value="2.9" step="0.01">
+
+  <label>Monthly Payment (PHP)</label>
+  <input type="number" id="ccPayment" value="20527">
+
+  <button onclick="runMonthlyCycle()">Run Monthly Cycle</button>
+
+  <progress id="ccBar"></progress>
+  <p class="accent" id="ccProgressText">0% paid</p>
+  <p class="muted" id="ccMonthsLeft"></p>
+
+  <a href="debt-guide.html" class="muted">📘 View Projected Payoff Guide →</a>
 </div>
 
 <div class="card">
-  <h2>📅 Monthly Check‑in</h2>
-  <label><input type="checkbox" id="checkin"> Did I follow the plan this month?</label>
-  <p class="affirmation" id="affirmation"></p>
-</div>
-
-<div class="card">
-  <h2>💼 Snapshot: Jan–May (With Debt)</h2>
-  <table>
-    <tr><th>Salary</th><td contenteditable>4000</td></tr>
-    <tr><th>Living Expenses</th><td contenteditable>1130</td></tr>
-    <tr><th>iPhone (until Aug 2026)</th><td contenteditable>478</td></tr>
-    <tr><th>Credit Card (Debt)</th><td contenteditable>1368</td></tr>
-    <tr><th>Available Cash</th><td class="accent">1024</td></tr>
-  </table>
-  <div class="countdown">
-    <span id="debtCountdown" style="font-weight: bold; color: var(--accent);"></span>
-  </div>
-</div>
-
-<div class="card">
-  <h2>🚀 Snapshot: Post-May (No CC Debt)</h2>
-  <table>
-    <tr><th>Salary</th><td contenteditable>4000</td></tr>
-    <tr><th>Living Expenses</th><td contenteditable>1130</td></tr>
-    <tr><th>iPhone (until Aug 2026)</th><td contenteditable>478</td></tr>
-    <tr><th>Credit Card (Debt)</th><td class="muted">0</td></tr>
-    <tr><th>Available Cash</th><td class="accent">2392</td></tr>
-  </table>
-  <p class="muted">This is your cash flow once debt is cleared!</p>
-</div>
-
-<div class="card">
-  <h2>🧠 Reminder</h2>
   <p class="accent">Progress beats perfection.</p>
 </div>
 
 <script>
-  const affirmations = [
-    "You are building something real. Stay steady.",
-    "One month of discipline beats years of regret.",
-    "Debt freedom is close. Don't quit now.",
-    "Future you is counting on today you."
-  ];
-
-  function updateProgress() {
-    const val = Number(document.getElementById('savings').value || 0);
-    document.getElementById('bar').value = val;
-    document.getElementById('progressText').innerText = `${val} / 24,710 MYR`;
-    localStorage.setItem('savings', val);
+  function updateSavings(){
+    const v=+savings.value||0;
+    savingsBar.value=v;
+    savingsText.innerText=`${v} / 24,710 MYR`;
+    localStorage.setItem('savings',v);
   }
 
-  function toggleMode() {
+  function updateCC(){
+    const total=+ccTotal.value||0;
+    const remaining=+ccRemaining.value||0;
+    const paid=Math.max(total-remaining,0);
+    const percent=total?(paid/total)*100:0;
+
+    ccBar.max=total;
+    ccBar.value=paid;
+
+    ccProgressText.innerText=
+      `${percent.toFixed(1)}% paid (${paid.toLocaleString()} / ${total.toLocaleString()} PHP)`;
+
+    if(ccPayment.value>0 && remaining>0){
+      ccMonthsLeft.innerText=
+        `⏳ Approx. ${Math.ceil(remaining/ccPayment.value)} months left`;
+    }else if(remaining===0){
+      ccMonthsLeft.innerText=`🎉 Debt-free`;
+    }
+
+    localStorage.setItem('ccRemaining',remaining);
+  }
+
+  function runMonthlyCycle(){
+    let balance=+ccRemaining.value||0;
+    const interestRate=(+ccInterest.value||0)/100;
+    const payment=+ccPayment.value||0;
+
+    // 1️⃣ apply interest
+    const interest=balance*interestRate;
+    balance+=interest;
+
+    // 2️⃣ apply payment
+    balance=Math.max(balance-payment,0);
+
+    ccRemaining.value=balance.toFixed(2);
+    updateCC();
+  }
+
+  function toggleMode(){
     document.body.classList.toggle('light');
-    localStorage.setItem('mode', document.body.className);
+    localStorage.setItem('mode',document.body.className);
   }
 
-  function updateCountdown() {
-    const targetDate = new Date(2026, 4, 1); 
-    const now = new Date();
-    const diffTime = targetDate - now;
-    const diffMonths = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 30.44));
-    
-    const element = document.getElementById('debtCountdown');
-    if (diffMonths > 0) {
-      element.innerText = `⏳ ${diffMonths} months until Credit Card is paid off!`;
-    } else {
-      element.innerText = `🎉 Credit Card Debt Cleared!`;
-    }
+  if(localStorage.getItem('savings')){
+    savings.value=localStorage.getItem('savings');
+    updateSavings();
   }
-
-  document.getElementById('checkin').addEventListener('change', e => {
-    if (!e.target.checked) {
-      document.getElementById('affirmation').innerText = affirmations[Math.floor(Math.random()*affirmations.length)];
-    } else {
-      document.getElementById('affirmation').innerText = "Good job. Stay consistent.";
-    }
-    localStorage.setItem('checkin', e.target.checked);
-  });
-
-  if (localStorage.getItem('savings')) document.getElementById('savings').value = localStorage.getItem('savings'), updateProgress();
-  if (localStorage.getItem('mode')) document.body.className = localStorage.getItem('mode');
-  if (localStorage.getItem('checkin') === 'true') document.getElementById('checkin').checked = true;
-  
-  updateCountdown();
+  if(localStorage.getItem('ccRemaining')){
+    ccRemaining.value=localStorage.getItem('ccRemaining');
+    updateCC();
+  }
+  if(localStorage.getItem('mode')){
+    document.body.className=localStorage.getItem('mode');
+  }
 </script>
 
 </body>
