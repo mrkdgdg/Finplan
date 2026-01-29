@@ -183,7 +183,7 @@
 
     if (ccPayment.value > 0 && remaining > 0) {
       ccMonthsLeft.innerText =
-        `⏳ Approx. ${Math.ceil(remaining / ccPayment.value)} months left`;
+        `⏳ Est. ${Math.ceil(remaining / ccPayment.value)}+ months left (interest not included)`;
     } else if (remaining === 0) {
       ccMonthsLeft.innerText = `🎉 Debt-free`;
     }
@@ -195,6 +195,8 @@
     let remaining = Number(ccRemaining.value || 0);
     const payment = Number(ccPayment.value || 0);
     const interestRate = Number(ccInterest.value || 0) / 100;
+
+    if (remaining <= 0) return;
 
     remaining += remaining * interestRate;
     remaining = Math.max(remaining - payment, 0);
@@ -225,7 +227,12 @@
   });
 
   if (localStorage.getItem('savings')) savings.value = localStorage.getItem('savings'), updateSavings();
-  if (localStorage.getItem('ccRemaining')) ccRemaining.value = localStorage.getItem('ccRemaining'), updateCC();
+  if (localStorage.getItem('ccRemaining')) {
+  ccRemaining.value = localStorage.getItem('ccRemaining');
+} else {
+  ccRemaining.value = ccTotal.value;
+}
+updateCC();
   if (localStorage.getItem('mode')) document.body.className = localStorage.getItem('mode');
   if (localStorage.getItem('checkin') === 'true') checkin.checked = true;
 
