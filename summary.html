@@ -104,7 +104,7 @@ th:first-child, td:first-child{
 </tr>
 </table>
 </div>
-<p class="muted">Payments include extra 14,000 PHP in March and April.</p>
+<p class="muted">Extra payments in March and April are applied directly to debt.</p>
 </div>
 
 <!-- SAVINGS SUMMARY -->
@@ -119,24 +119,24 @@ th:first-child, td:first-child{
 </tr>
 </table>
 </div>
-<p class="muted">Shows planned cash flow from March to September 2026. Extra payments are outside this plan.</p>
+<p class="muted">Planned cash flow ignores extra payments; iPhone included; full available cash starts once debt is cleared.</p>
 </div>
 
 <script>
-// Credit card and savings settings
-let balance = 100000;
+// Settings
+let balance = 100000; // PHP
 const interestRate = 0.03;
 const monthlyPayment = 20527;
 const months = ["Mar","Apr","May","Jun","Jul","Aug","Sep"];
-const extraPayments = {"Mar":14000,"Apr":14000}; // actual extra payments
+const extraPayments = {"Mar":14000,"Apr":14000};
 const phpToMyr = 14;
 
-// Monthly amounts
+// Salary / Expenses
 const salary = 3870;
 const living = 1130;
 const iphone = 478;
 
-// Populate Credit Card Table (includes extra payments)
+// CREDIT CARD TABLE
 const ccTable = document.getElementById("ccSummary");
 months.forEach(month => {
   let start = balance;
@@ -149,23 +149,21 @@ months.forEach(month => {
 
   const row = document.createElement("tr");
   row.innerHTML = `
-  <td>${month}</td>
-  <td>${start.toLocaleString()}</td>
-  <td>${interest.toLocaleString()}</td>
-  <td>${payment.toLocaleString()}</td>
-  <td class="${ending===0?'paid':''}">${ending.toLocaleString()}</td>
+    <td>${month}</td>
+    <td>${start.toLocaleString()}</td>
+    <td>${interest.toLocaleString()}</td>
+    <td>${payment.toLocaleString()}</td>
+    <td class="${ending===0?'paid':''}">${ending.toLocaleString()}</td>
   `;
   ccTable.appendChild(row);
 });
 
-// Populate Planned Savings Table (ignores extra payments)
+// PLANNED SAVINGS TABLE
 let accumulatedSavings = 0;
 const savingsTable = document.getElementById("savingsSummary");
-
-// Convert monthly credit card payment to MYR
 const plannedDebtPaymentMyr = monthlyPayment / phpToMyr;
 
-// Determine the month debt ends (after applying extra payments)
+// Determine months debt is active (after extra payments)
 let debtMonths = 0;
 let tempBalance = 100000;
 for(const m of months){
@@ -176,17 +174,17 @@ for(const m of months){
   if(tempBalance <= 0) break;
 }
 
-// Fill savings table
-months.forEach((month, index) => {
-  let debtActive = index < debtMonths; // debt exists during these months
+// Populate savings table
+months.forEach((month,index)=>{
+  let debtActive = index < debtMonths; // debt exists
   let cash = debtActive ? salary - living - iphone - plannedDebtPaymentMyr : salary - living - iphone;
   accumulatedSavings += cash;
 
   const row = document.createElement("tr");
   row.innerHTML = `
-  <td>${month}</td>
-  <td class="${cash<0?'neg':''}">${cash.toFixed(0)}</td>
-  <td>${accumulatedSavings.toFixed(0)}</td>
+    <td>${month}</td>
+    <td class="${cash<0?'neg':''}">${cash.toFixed(0)}</td>
+    <td>${accumulatedSavings.toFixed(0)}</td>
   `;
   savingsTable.appendChild(row);
 });
