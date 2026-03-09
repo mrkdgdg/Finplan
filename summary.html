@@ -6,188 +6,76 @@
 <title>Credit Card & Savings Summary</title>
 
 <style>
-:root{
-  --bg:#0f172a;
-  --card:#020617;
-  --text:#e5e7eb;
-  --muted:#94a3b8;
-  --accent:#22c55e;
-  --warn:#facc15;
-  --neg:#f87171;
-  --paid:#22c55e;
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  margin: 0;
+  padding: 16px;
+  background: #0f172a;
+  color: #e5e7eb;
 }
-
-body.light{
-  --bg:#f8fafc;
-  --card:#ffffff;
-  --text:#020617;
-  --muted:#475569;
+body.light {
+  background: #f8fafc;
+  color: #020617;
 }
-
-body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-  background:var(--bg);
-  color:var(--text);
-  padding:16px;
+h1, h2 { margin-top: 0; }
+.card {
+  background: #020617;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 8px 20px rgba(0,0,0,.25);
 }
-
-h1,h2{margin-top:0}
-
-.card{
-  background:var(--card);
-  border-radius:14px;
-  padding:16px;
-  margin-bottom:16px;
-  box-shadow:0 8px 20px rgba(0,0,0,.25);
-}
-
-.table-wrapper{
-  overflow-x:auto;
-}
-
-table{
-  width:100%;
-  min-width:500px;
-  border-collapse:collapse;
-  margin-top:10px;
-}
-
-td,th{
-  padding:8px;
-  border-bottom:1px solid #334155;
-  font-size:14px;
-  white-space: nowrap;
-  text-align:right;
-}
-
-th:first-child, td:first-child{
-  text-align:left;
-}
-
-.accent{
-  color:var(--accent);
-  font-weight:600;
-}
-
-.muted{
-  color:var(--muted);
-  font-size:13px;
-}
-
-.toggle{
-  float:right;
-}
-.neg { color: var(--neg); }
-.paid { color: var(--paid); font-weight:600; }
+.table-wrapper { overflow-x:auto; }
+table { width:100%; border-collapse: collapse; min-width:500px; margin-top:10px; }
+td, th { padding: 8px; border-bottom: 1px solid #334155; text-align:right; white-space: nowrap; }
+th:first-child, td:first-child { text-align:left; }
+.accent { color: #22c55e; font-weight:600; }
+.muted { color: #94a3b8; font-size:13px; }
+.toggle { float:right; }
+.paid { color:#22c55e; font-weight:600; }
 </style>
 </head>
-
 <body>
 
-<button class="toggle" onclick="toggleMode()">🌗 Toggle</button>
+<button class="toggle" onclick="document.body.classList.toggle('light')">🌗 Toggle</button>
 
 <h1>📊 Credit Card & Savings Summary</h1>
 <a href="index.html" class="muted">⬅ Back to Main Page</a>
 
 <!-- CREDIT CARD SUMMARY -->
 <div class="card">
-<h2>💳 Credit Card Payments</h2>
+<h2>💳 Credit Card Payments (PHP)</h2>
 <div class="table-wrapper">
-<table id="ccSummary">
-<tr>
-<th>Month</th>
-<th>Starting Balance (PHP)</th>
-<th>Interest (PHP)</th>
-<th>Payment (PHP)</th>
-<th>Ending Balance (PHP)</th>
-</tr>
+<table>
+<tr><th>Month</th><th>Starting Balance</th><th>Interest</th><th>Payment</th><th>Ending Balance</th></tr>
+<tr><td>Mar</td><td>100,000</td><td>3,000</td><td>21,527</td><td>81,473</td></tr>
+<tr><td>Apr</td><td>81,473</td><td>2,444</td><td>21,527</td><td>62,390</td></tr>
+<tr><td>May</td><td>62,390</td><td>1,872</td><td>21,527</td><td>42,735</td></tr>
+<tr><td>Jun</td><td>42,735</td><td>1,282</td><td>21,527</td><td>22,490</td></tr>
+<tr><td>Jul</td><td>22,490</td><td>675</td><td>21,527</td><td>1,638</td></tr>
+<tr><td>Aug</td><td>1,638</td><td>49</td><td>1,687</td><td>0</td></tr>
 </table>
 </div>
-<p class="muted">Extra payments in March and April are applied directly to debt only.</p>
+<p class="muted">Extra payments in Mar & Apr are included in these totals.</p>
 </div>
 
 <!-- SAVINGS SUMMARY -->
 <div class="card">
-<h2>💰 Planned Available Cash & Savings</h2>
+<h2>💰 Planned Available Cash & Accumulated Savings (MYR)</h2>
 <div class="table-wrapper">
-<table id="savingsSummary">
-<tr>
-<th>Month</th>
-<th>Available Cash (MYR)</th>
-<th>Accumulated Savings (MYR)</th>
-</tr>
+<table>
+<tr><th>Month</th><th>Available Cash</th><th>Accumulated Savings</th></tr>
+<tr><td>Mar</td><td>897</td><td>897</td></tr>
+<tr><td>Apr</td><td>897</td><td>1,794</td></tr>
+<tr><td>May</td><td>897</td><td>2,691</td></tr>
+<tr><td>Jun</td><td>2,262</td><td>4,953</td></tr>
+<tr><td>Jul</td><td>2,262</td><td>7,215</td></tr>
+<tr><td>Aug</td><td>2,262</td><td>9,477</td></tr>
+<tr><td>Sep</td><td>2,262</td><td>11,739</td></tr>
 </table>
 </div>
-<p class="muted">Planned cash flow ignores extra payments; iPhone included; full available cash starts once debt is cleared.</p>
+<p class="muted">Available cash reflects planned cash; extra payments do not reduce it. iPhone included in all months.</p>
 </div>
-
-<script>
-// SETTINGS
-let balance = 100000; // PHP
-const interestRate = 0.03;
-const monthlyPayment = 20527;
-const months = ["Mar","Apr","May","Jun","Jul","Aug","Sep"];
-const extraPayments = {"Mar":14000,"Apr":14000};
-const phpToMyr = 14;
-
-// SALARY / EXPENSES
-const salary = 3870;
-const living = 1130;
-const iphone = 478;
-
-// CREDIT CARD TABLE
-const ccTable = document.getElementById("ccSummary");
-months.forEach(month => {
-  let start = balance;
-  let interest = start * interestRate;
-  balance += interest;
-
-  let payment = monthlyPayment + (extraPayments[month] || 0);
-  balance -= payment;
-  let ending = Math.max(balance,0);
-
-  const row = document.createElement("tr");
-  row.innerHTML = `
-    <td>${month}</td>
-    <td>${start.toLocaleString()}</td>
-    <td>${interest.toLocaleString()}</td>
-    <td>${payment.toLocaleString()}</td>
-    <td class="${ending===0?'paid':''}">${ending.toLocaleString()}</td>
-  `;
-  ccTable.appendChild(row);
-});
-
-// PLANNED SAVINGS TABLE
-let accumulatedSavings = 0;
-const savingsTable = document.getElementById("savingsSummary");
-const plannedDebtPaymentMyr = monthlyPayment / phpToMyr;
-
-// DETERMINE DEBT MONTHS (ignoring extra payments for cash)
-let tempBalance = 100000;
-let debtMonths = 0;
-for(const m of months){
-  tempBalance = tempBalance*(1+interestRate);
-  tempBalance -= monthlyPayment; // extra payments ignored for cash
-  debtMonths++;
-  if(tempBalance <= 0) break;
-}
-
-// FILL SAVINGS TABLE
-months.forEach((month,index)=>{
-  let debtActive = index < debtMonths; 
-  let cash = debtActive ? salary - living - iphone - plannedDebtPaymentMyr : salary - living - iphone;
-  accumulatedSavings += cash;
-
-  const row = document.createElement("tr");
-  row.innerHTML = `
-    <td>${month}</td>
-    <td class="${cash<0?'neg':''}">${cash.toFixed(0)}</td>
-    <td>${accumulatedSavings.toFixed(0)}</td>
-  `;
-  savingsTable.appendChild(row);
-});
-</script>
 
 </body>
 </html>
