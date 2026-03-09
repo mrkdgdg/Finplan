@@ -162,12 +162,24 @@ months.forEach(month => {
 let accumulatedSavings = 0;
 const savingsTable = document.getElementById("savingsSummary");
 
-// Planned cash while debt exists
+// Convert monthly credit card payment to MYR
 const plannedDebtPaymentMyr = monthlyPayment / phpToMyr;
 
-months.forEach(month => {
-  let debtRemaining = (month==="Jun" || month==="Jul" || month==="Aug" || month==="Sep") ? 0 : 1; // debt exists Mar–May
-  let cash = debtRemaining ? salary - living - iphone - plannedDebtPaymentMyr : salary - living - iphone;
+// Determine the month debt ends (after applying extra payments)
+let debtMonths = 0;
+let tempBalance = 100000;
+for(const m of months){
+  tempBalance = tempBalance*(1+interestRate);
+  let payment = monthlyPayment + (extraPayments[m] || 0);
+  tempBalance -= payment;
+  debtMonths++;
+  if(tempBalance <= 0) break;
+}
+
+// Fill savings table
+months.forEach((month, index) => {
+  let debtActive = index < debtMonths; // debt exists during these months
+  let cash = debtActive ? salary - living - iphone - plannedDebtPaymentMyr : salary - living - iphone;
   accumulatedSavings += cash;
 
   const row = document.createElement("tr");
