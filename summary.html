@@ -7,76 +7,79 @@
 
 <style>
 :root{
---bg:#0f172a;
---card:#020617;
---text:#e5e7eb;
---muted:#94a3b8;
---accent:#22c55e;
---warn:#facc15;
---neg:#f87171; /* red for negative cash */
+  --bg:#0f172a;
+  --card:#020617;
+  --text:#e5e7eb;
+  --muted:#94a3b8;
+  --accent:#22c55e;
+  --warn:#facc15;
+  --neg:#f87171;
+  --paid:#22c55e;
 }
 
 body.light{
---bg:#f8fafc;
---card:#ffffff;
---text:#020617;
---muted:#475569;
+  --bg:#f8fafc;
+  --card:#ffffff;
+  --text:#020617;
+  --muted:#475569;
 }
 
 body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
-background:var(--bg);
-color:var(--text);
-padding:16px;
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  padding:16px;
 }
 
 h1,h2{margin-top:0}
 
 .card{
-background:var(--card);
-border-radius:14px;
-padding:16px;
-margin-bottom:16px;
-box-shadow:0 8px 20px rgba(0,0,0,.25);
+  background:var(--card);
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:16px;
+  box-shadow:0 8px 20px rgba(0,0,0,.25);
 }
 
 .table-wrapper{
-overflow-x:auto;
+  overflow-x:auto;
 }
 
 table{
-width:100%;
-min-width:500px;
-border-collapse:collapse;
-margin-top:10px;
+  width:100%;
+  min-width:500px;
+  border-collapse:collapse;
+  margin-top:10px;
 }
 
 td,th{
-padding:8px;
-border-bottom:1px solid #334155;
-font-size:14px;
-white-space: nowrap;
-text-align:right;
+  padding:8px;
+  border-bottom:1px solid #334155;
+  font-size:14px;
+  white-space: nowrap;
+  text-align:right;
 }
 
 th:first-child, td:first-child{
-text-align:left;
+  text-align:left;
 }
 
 .accent{
-color:var(--accent);
-font-weight:600;
+  color:var(--accent);
+  font-weight:600;
 }
 
 .muted{
-color:var(--muted);
-font-size:13px;
+  color:var(--muted);
+  font-size:13px;
 }
 
 .toggle{
-float:right;
+  float:right;
 }
+.neg { color: var(--neg); }
+.paid { color: var(--paid); font-weight:600; }
 </style>
 </head>
 
@@ -106,7 +109,7 @@ float:right;
 
 <!-- SAVINGS SUMMARY -->
 <div class="card">
-<h2>💰 Savings Projection</h2>
+<h2>💰 Planned Available Cash & Savings</h2>
 <div class="table-wrapper">
 <table id="savingsSummary">
 <tr>
@@ -116,28 +119,25 @@ float:right;
 </tr>
 </table>
 </div>
-<p class="muted">Projection from March to September 2026, including debt payoff and iPhone payments. Negative cash shown in red.</p>
+<p class="muted">Shows planned cash flow from March to September 2026. Extra payments are outside this plan.</p>
 </div>
 
 <script>
-// Settings
+// Credit card and savings settings
 let balance = 100000;
 const interestRate = 0.03;
 const monthlyPayment = 20527;
 const months = ["Mar","Apr","May","Jun","Jul","Aug","Sep"];
-const extraPayments = {"Mar":14000,"Apr":14000};
-const phpToMyr = 14; // conversion rate PHP -> MYR
+const extraPayments = {"Mar":14000,"Apr":14000}; // actual extra payments
+const phpToMyr = 14;
 
 // Monthly amounts
 const salary = 3870;
 const living = 1130;
 const iphone = 478;
 
-let accumulatedSavings = 0;
-
-// Populate Credit Card Table
+// Populate Credit Card Table (includes extra payments)
 const ccTable = document.getElementById("ccSummary");
-
 months.forEach(month => {
   let start = balance;
   let interest = start * interestRate;
@@ -153,37 +153,28 @@ months.forEach(month => {
   <td>${start.toLocaleString()}</td>
   <td>${interest.toLocaleString()}</td>
   <td>${payment.toLocaleString()}</td>
-  <td>${ending.toLocaleString()}</td>
+  <td class="${ending===0?'paid':''}">${ending.toLocaleString()}</td>
   `;
   ccTable.appendChild(row);
 });
 
-// Populate Savings Table
-let currentBalance = 100000;
+// Populate Planned Savings Table (ignores extra payments)
+let accumulatedSavings = 0;
 const savingsTable = document.getElementById("savingsSummary");
 
+// Planned cash while debt exists
+const plannedDebtPaymentMyr = monthlyPayment / phpToMyr;
+
 months.forEach(month => {
-  let payment = monthlyPayment + (extraPayments[month] || 0);
-
-  // Convert PHP payment to MYR
-  let paymentMyr = payment / phpToMyr;
-
-  // Update debt balance
-  currentBalance = currentBalance*(1+interestRate);
-  currentBalance -= payment;
-
-  // Determine available cash
-  let cash = currentBalance > 0
-             ? salary - living - iphone - paymentMyr
-             : salary - living - iphone;
-
+  let debtRemaining = (month==="Jun" || month==="Jul" || month==="Aug" || month==="Sep") ? 0 : 1; // debt exists Mar–May
+  let cash = debtRemaining ? salary - living - iphone - plannedDebtPaymentMyr : salary - living - iphone;
   accumulatedSavings += cash;
 
   const row = document.createElement("tr");
   row.innerHTML = `
   <td>${month}</td>
   <td class="${cash<0?'neg':''}">${cash.toFixed(0)}</td>
-  <td class="${accumulatedSavings<0?'neg':''}">${accumulatedSavings.toFixed(0)}</td>
+  <td>${accumulatedSavings.toFixed(0)}</td>
   `;
   savingsTable.appendChild(row);
 });
