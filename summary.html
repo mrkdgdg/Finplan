@@ -104,7 +104,7 @@ th:first-child, td:first-child{
 </tr>
 </table>
 </div>
-<p class="muted">Extra payments in March and April are applied directly to debt.</p>
+<p class="muted">Extra payments in March and April are applied directly to debt only.</p>
 </div>
 
 <!-- SAVINGS SUMMARY -->
@@ -123,7 +123,7 @@ th:first-child, td:first-child{
 </div>
 
 <script>
-// Settings
+// SETTINGS
 let balance = 100000; // PHP
 const interestRate = 0.03;
 const monthlyPayment = 20527;
@@ -131,7 +131,7 @@ const months = ["Mar","Apr","May","Jun","Jul","Aug","Sep"];
 const extraPayments = {"Mar":14000,"Apr":14000};
 const phpToMyr = 14;
 
-// Salary / Expenses
+// SALARY / EXPENSES
 const salary = 3870;
 const living = 1130;
 const iphone = 478;
@@ -163,20 +163,19 @@ let accumulatedSavings = 0;
 const savingsTable = document.getElementById("savingsSummary");
 const plannedDebtPaymentMyr = monthlyPayment / phpToMyr;
 
-// Determine months debt is active (after extra payments)
-let debtMonths = 0;
+// DETERMINE DEBT MONTHS (ignoring extra payments for cash)
 let tempBalance = 100000;
+let debtMonths = 0;
 for(const m of months){
   tempBalance = tempBalance*(1+interestRate);
-  let payment = monthlyPayment + (extraPayments[m] || 0);
-  tempBalance -= payment;
+  tempBalance -= monthlyPayment; // extra payments ignored for cash
   debtMonths++;
   if(tempBalance <= 0) break;
 }
 
-// Populate savings table
+// FILL SAVINGS TABLE
 months.forEach((month,index)=>{
-  let debtActive = index < debtMonths; // debt exists
+  let debtActive = index < debtMonths; 
   let cash = debtActive ? salary - living - iphone - plannedDebtPaymentMyr : salary - living - iphone;
   accumulatedSavings += cash;
 
