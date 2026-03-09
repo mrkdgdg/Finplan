@@ -40,8 +40,13 @@ margin-bottom:16px;
 box-shadow:0 8px 20px rgba(0,0,0,.25);
 }
 
+.table-wrapper{
+overflow-x:auto;
+}
+
 table{
 width:100%;
+min-width:500px;
 border-collapse:collapse;
 margin-top:10px;
 }
@@ -49,10 +54,14 @@ margin-top:10px;
 td,th{
 padding:8px;
 border-bottom:1px solid #334155;
-font-size:14px
+font-size:14px;
+white-space: nowrap;
+text-align:right;
 }
 
-th{text-align:left}
+th:first-child, td:first-child{
+text-align:left;
+}
 
 .accent{
 color:var(--accent);
@@ -67,7 +76,6 @@ font-size:13px
 .toggle{
 float:right
 }
-
 </style>
 </head>
 
@@ -76,28 +84,29 @@ float:right
 <button class="toggle" onclick="toggleMode()">🌗 Toggle</button>
 
 <h1>📊 Credit Card & Savings Summary</h1>
+<a href="index.html" class="muted">⬅ Back to Main Page</a>
 
 <!-- CREDIT CARD SUMMARY -->
 <div class="card">
 <h2>💳 Credit Card Payments</h2>
-
+<div class="table-wrapper">
 <table id="ccSummary">
 <tr>
 <th>Month</th>
 <th>Starting Balance (PHP)</th>
 <th>Interest (PHP)</th>
-<th>Regular Payment (PHP)</th>
-<th>Extra Payment (PHP)</th>
+<th>Payment (PHP)</th>
 <th>Ending Balance (PHP)</th>
 </tr>
 </table>
-<p class="muted">Includes extra payments in March and April.</p>
+</div>
+<p class="muted">Payments include extra 14,000 PHP in March and April.</p>
 </div>
 
 <!-- SAVINGS SUMMARY -->
 <div class="card">
 <h2>💰 Savings Projection</h2>
-
+<div class="table-wrapper">
 <table id="savingsSummary">
 <tr>
 <th>Month</th>
@@ -105,18 +114,16 @@ float:right
 <th>Accumulated Savings (MYR)</th>
 </tr>
 </table>
-<p class="muted">Projection from March to September 2026, including the effect of debt payoff.</p>
+</div>
+<p class="muted">Projection from March to September 2026, including debt payoff.</p>
 </div>
 
 <script>
-
-// Settings
 let balance = 100000;
 const interestRate = 0.03;
 const monthlyPayment = 20527;
 const months = ["Mar","Apr","May","Jun","Jul","Aug","Sep"];
-const extraPayments = {"Mar":14000,"Apr":14000};
-
+const extraPayments = {"Mar":14000,"Apr":14000}; // added into main payment
 let accumulatedSavings = 0;
 
 function toggleMode(){
@@ -132,11 +139,10 @@ let start = balance;
 let interest = start * interestRate;
 balance += interest;
 
-let extra = extraPayments[month] || 0;
+// Merge extra payment into main payment
+let payment = monthlyPayment + (extraPayments[month] || 0);
 
-balance -= monthlyPayment;
-balance -= extra;
-
+balance -= payment;
 let ending = Math.max(balance,0);
 
 const row = document.createElement("tr");
@@ -144,8 +150,7 @@ row.innerHTML = `
 <td>${month}</td>
 <td>${start.toLocaleString()}</td>
 <td>${interest.toLocaleString()}</td>
-<td>${monthlyPayment.toLocaleString()}</td>
-<td>${extra.toLocaleString()}</td>
+<td>${payment.toLocaleString()}</td>
 <td>${ending.toLocaleString()}</td>
 `;
 ccTable.appendChild(row);
@@ -161,12 +166,12 @@ const savingsTable = document.getElementById("savingsSummary");
 
 months.forEach(month => {
 
-let extra = extraPayments[month] || 0;
+// Payment including extra
+let payment = monthlyPayment + (extraPayments[month] || 0);
 
-// Check if debt is paid this month
+// Update debt balance
 currentBalance = currentBalance*(1+interestRate);
-currentBalance -= monthlyPayment;
-currentBalance -= extra;
+currentBalance -= payment;
 
 let cash = currentBalance>0 ? cashWhileDebt : cashAfterDebt;
 
@@ -181,7 +186,6 @@ row.innerHTML = `
 savingsTable.appendChild(row);
 
 });
-
 </script>
 
 </body>
