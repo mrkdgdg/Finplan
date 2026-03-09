@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Credit Card & Savings Summary</title>
+
+<style>
+:root{
+--bg:#0f172a;
+--card:#020617;
+--text:#e5e7eb;
+--muted:#94a3b8;
+--accent:#22c55e;
+--warn:#facc15;
+}
+
+body.light{
+--bg:#f8fafc;
+--card:#ffffff;
+--text:#020617;
+--muted:#475569;
+}
+
+body{
+margin:0;
+font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+background:var(--bg);
+color:var(--text);
+padding:16px;
+}
+
+h1,h2{margin-top:0}
+
+.card{
+background:var(--card);
+border-radius:14px;
+padding:16px;
+margin-bottom:16px;
+box-shadow:0 8px 20px rgba(0,0,0,.25);
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+td,th{
+padding:8px;
+border-bottom:1px solid #334155;
+font-size:14px
+}
+
+th{text-align:left}
+
+.accent{
+color:var(--accent);
+font-weight:600
+}
+
+.muted{
+color:var(--muted);
+font-size:13px
+}
+
+.toggle{
+float:right
+}
+
+</style>
+</head>
+
+<body>
+
+<button class="toggle" onclick="toggleMode()">🌗 Toggle</button>
+
+<h1>📊 Credit Card & Savings Summary</h1>
+
+<!-- CREDIT CARD SUMMARY -->
+<div class="card">
+<h2>💳 Credit Card Payments</h2>
+
+<table id="ccSummary">
+<tr>
+<th>Month</th>
+<th>Starting Balance (PHP)</th>
+<th>Interest (PHP)</th>
+<th>Regular Payment (PHP)</th>
+<th>Extra Payment (PHP)</th>
+<th>Ending Balance (PHP)</th>
+</tr>
+</table>
+<p class="muted">Includes extra payments in March and April.</p>
+</div>
+
+<!-- SAVINGS SUMMARY -->
+<div class="card">
+<h2>💰 Savings Projection</h2>
+
+<table id="savingsSummary">
+<tr>
+<th>Month</th>
+<th>Available Cash (MYR)</th>
+<th>Accumulated Savings (MYR)</th>
+</tr>
+</table>
+<p class="muted">Projection from March to September 2026, including the effect of debt payoff.</p>
+</div>
+
+<script>
+
+// Settings
+let balance = 100000;
+const interestRate = 0.03;
+const monthlyPayment = 20527;
+const months = ["Mar","Apr","May","Jun","Jul","Aug","Sep"];
+const extraPayments = {"Mar":14000,"Apr":14000};
+
+let accumulatedSavings = 0;
+
+function toggleMode(){
+document.body.classList.toggle("light");
+}
+
+// Populate Credit Card Table
+const ccTable = document.getElementById("ccSummary");
+
+months.forEach(month => {
+
+let start = balance;
+let interest = start * interestRate;
+balance += interest;
+
+let extra = extraPayments[month] || 0;
+
+balance -= monthlyPayment;
+balance -= extra;
+
+let ending = Math.max(balance,0);
+
+const row = document.createElement("tr");
+row.innerHTML = `
+<td>${month}</td>
+<td>${start.toLocaleString()}</td>
+<td>${interest.toLocaleString()}</td>
+<td>${monthlyPayment.toLocaleString()}</td>
+<td>${extra.toLocaleString()}</td>
+<td>${ending.toLocaleString()}</td>
+`;
+ccTable.appendChild(row);
+
+});
+
+// Populate Savings Table
+let cashWhileDebt = 897;
+let cashAfterDebt = 2265;
+let currentBalance = 100000;
+
+const savingsTable = document.getElementById("savingsSummary");
+
+months.forEach(month => {
+
+let extra = extraPayments[month] || 0;
+
+// Check if debt is paid this month
+currentBalance = currentBalance*(1+interestRate);
+currentBalance -= monthlyPayment;
+currentBalance -= extra;
+
+let cash = currentBalance>0 ? cashWhileDebt : cashAfterDebt;
+
+accumulatedSavings += cash;
+
+const row = document.createElement("tr");
+row.innerHTML = `
+<td>${month}</td>
+<td>${cash}</td>
+<td>${accumulatedSavings}</td>
+`;
+savingsTable.appendChild(row);
+
+});
+
+</script>
+
+</body>
+</html>
