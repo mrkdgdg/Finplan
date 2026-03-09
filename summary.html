@@ -115,7 +115,7 @@ float:right
 </tr>
 </table>
 </div>
-<p class="muted">Projection from March to September 2026, including debt payoff.</p>
+<p class="muted">Projection from March to September 2026, including debt payoff and iPhone payments.</p>
 </div>
 
 <script>
@@ -123,67 +123,69 @@ let balance = 100000;
 const interestRate = 0.03;
 const monthlyPayment = 20527;
 const months = ["Mar","Apr","May","Jun","Jul","Aug","Sep"];
-const extraPayments = {"Mar":14000,"Apr":14000}; // added into main payment
+const extraPayments = {"Mar":14000,"Apr":14000}; // merged into main payment
 let accumulatedSavings = 0;
 
-function toggleMode(){
-document.body.classList.toggle("light");
-}
+// Monthly amounts
+const salary = 3870;
+const living = 1130;
+const iphone = 478;
 
 // Populate Credit Card Table
 const ccTable = document.getElementById("ccSummary");
 
 months.forEach(month => {
 
-let start = balance;
-let interest = start * interestRate;
-balance += interest;
+  let start = balance;
+  let interest = start * interestRate;
+  balance += interest;
 
-// Merge extra payment into main payment
-let payment = monthlyPayment + (extraPayments[month] || 0);
+  // Merge extra payment into main payment
+  let payment = monthlyPayment + (extraPayments[month] || 0);
 
-balance -= payment;
-let ending = Math.max(balance,0);
+  balance -= payment;
+  let ending = Math.max(balance,0);
 
-const row = document.createElement("tr");
-row.innerHTML = `
-<td>${month}</td>
-<td>${start.toLocaleString()}</td>
-<td>${interest.toLocaleString()}</td>
-<td>${payment.toLocaleString()}</td>
-<td>${ending.toLocaleString()}</td>
-`;
-ccTable.appendChild(row);
+  const row = document.createElement("tr");
+  row.innerHTML = `
+  <td>${month}</td>
+  <td>${start.toLocaleString()}</td>
+  <td>${interest.toLocaleString()}</td>
+  <td>${payment.toLocaleString()}</td>
+  <td>${ending.toLocaleString()}</td>
+  `;
+  ccTable.appendChild(row);
 
 });
 
 // Populate Savings Table
-let cashWhileDebt = 897;
-let cashAfterDebt = 2265;
+let cashWhileDebt = salary - living - iphone - monthlyPayment; // March–May baseline
+let cashAfterDebt = salary - living - iphone; // June–Sept
 let currentBalance = 100000;
 
 const savingsTable = document.getElementById("savingsSummary");
 
 months.forEach(month => {
 
-// Payment including extra
-let payment = monthlyPayment + (extraPayments[month] || 0);
+  // Payment including extra
+  let payment = monthlyPayment + (extraPayments[month] || 0);
 
-// Update debt balance
-currentBalance = currentBalance*(1+interestRate);
-currentBalance -= payment;
+  // Update debt balance
+  currentBalance = currentBalance*(1+interestRate);
+  currentBalance -= payment;
 
-let cash = currentBalance>0 ? cashWhileDebt : cashAfterDebt;
+  // Determine available cash
+  let cash = currentBalance > 0 ? cashWhileDebt : cashAfterDebt;
 
-accumulatedSavings += cash;
+  accumulatedSavings += cash;
 
-const row = document.createElement("tr");
-row.innerHTML = `
-<td>${month}</td>
-<td>${cash}</td>
-<td>${accumulatedSavings}</td>
-`;
-savingsTable.appendChild(row);
+  const row = document.createElement("tr");
+  row.innerHTML = `
+  <td>${month}</td>
+  <td>${cash}</td>
+  <td>${accumulatedSavings}</td>
+  `;
+  savingsTable.appendChild(row);
 
 });
 </script>
