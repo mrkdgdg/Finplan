@@ -13,6 +13,7 @@
 --muted:#94a3b8;
 --accent:#22c55e;
 --warn:#facc15;
+--neg:#f87171; /* red for negative cash */
 }
 
 body.light{
@@ -65,16 +66,16 @@ text-align:left;
 
 .accent{
 color:var(--accent);
-font-weight:600
+font-weight:600;
 }
 
 .muted{
 color:var(--muted);
-font-size:13px
+font-size:13px;
 }
 
 .toggle{
-float:right
+float:right;
 }
 </style>
 </head>
@@ -115,34 +116,34 @@ float:right
 </tr>
 </table>
 </div>
-<p class="muted">Projection from March to September 2026, including debt payoff and iPhone payments.</p>
+<p class="muted">Projection from March to September 2026, including debt payoff and iPhone payments. Negative cash shown in red.</p>
 </div>
 
 <script>
+// Settings
 let balance = 100000;
 const interestRate = 0.03;
 const monthlyPayment = 20527;
 const months = ["Mar","Apr","May","Jun","Jul","Aug","Sep"];
-const extraPayments = {"Mar":14000,"Apr":14000}; // merged into main payment
-let accumulatedSavings = 0;
+const extraPayments = {"Mar":14000,"Apr":14000};
+const phpToMyr = 14; // conversion rate PHP -> MYR
 
 // Monthly amounts
 const salary = 3870;
 const living = 1130;
 const iphone = 478;
 
+let accumulatedSavings = 0;
+
 // Populate Credit Card Table
 const ccTable = document.getElementById("ccSummary");
 
 months.forEach(month => {
-
   let start = balance;
   let interest = start * interestRate;
   balance += interest;
 
-  // Merge extra payment into main payment
   let payment = monthlyPayment + (extraPayments[month] || 0);
-
   balance -= payment;
   let ending = Math.max(balance,0);
 
@@ -155,38 +156,36 @@ months.forEach(month => {
   <td>${ending.toLocaleString()}</td>
   `;
   ccTable.appendChild(row);
-
 });
 
 // Populate Savings Table
-let cashWhileDebt = salary - living - iphone - monthlyPayment; // March–May baseline
-let cashAfterDebt = salary - living - iphone; // June–Sept
 let currentBalance = 100000;
-
 const savingsTable = document.getElementById("savingsSummary");
 
 months.forEach(month => {
-
-  // Payment including extra
   let payment = monthlyPayment + (extraPayments[month] || 0);
+
+  // Convert PHP payment to MYR
+  let paymentMyr = payment / phpToMyr;
 
   // Update debt balance
   currentBalance = currentBalance*(1+interestRate);
   currentBalance -= payment;
 
   // Determine available cash
-  let cash = currentBalance > 0 ? cashWhileDebt : cashAfterDebt;
+  let cash = currentBalance > 0
+             ? salary - living - iphone - paymentMyr
+             : salary - living - iphone;
 
   accumulatedSavings += cash;
 
   const row = document.createElement("tr");
   row.innerHTML = `
   <td>${month}</td>
-  <td>${cash}</td>
-  <td>${accumulatedSavings}</td>
+  <td class="${cash<0?'neg':''}">${cash.toFixed(0)}</td>
+  <td class="${accumulatedSavings<0?'neg':''}">${accumulatedSavings.toFixed(0)}</td>
   `;
   savingsTable.appendChild(row);
-
 });
 </script>
 
